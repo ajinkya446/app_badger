@@ -1,14 +1,4 @@
-# app_badger Flutter Plugin
 
-A Flutter plugin to manage app badge counts on different Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) using the ShortcutBadger library.
-
-## Installation
-
-Here’s the full README file for the app_badger plugin with all the necessary details:
-
-markdown
-Copy
-Edit
 # app_badger Flutter Plugin
 
 A Flutter plugin to manage app badge counts on different Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) using the ShortcutBadger library.
@@ -20,21 +10,23 @@ To use the app_badger plugin in your Flutter project, add it to your `pubspec.ya
 ```yaml
 dependencies:
   app_badger: ^1.0.0
+```
+
 Then, run the following command in the terminal:
 
-bash
-Copy
-Edit
+```bash
 flutter pub get
-Required Setup for Android
-The plugin requires specific configurations in the AndroidManifest.xml file to ensure compatibility with various device brands (Xiaomi, Samsung, HTC, Sony, Huawei, etc.).
+```
 
-## 1. Add Permissions and Receiver to AndroidManifest.xml
-To enable the badge feature on different Android devices, add the following entries inside the <application> tag in your android/app/src/main/AndroidManifest.xml file:
+## Required Setup for Android
 
-xml
-Copy
-Edit
+The plugin requires specific configurations in the `AndroidManifest.xml` file to ensure compatibility with various device brands (Xiaomi, Samsung, HTC, Sony, Huawei, etc.).
+
+### 1. Add Permissions and Receiver to `AndroidManifest.xml`
+
+To enable the badge feature on different Android devices, add the following entries inside the `<application>` tag in your `android/app/src/main/AndroidManifest.xml` file:
+
+```xml
 <receiver
     android:name="me.leolin.shortcutbadger.impl.XiaomiHomeBadger"
     android:exported="true">
@@ -82,57 +74,62 @@ Edit
 <!-- Permissions for EvMe -->
 <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_READ" />
 <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_WRITE" />
-## 2. Additional Requirement: Notifications
+```
+
+### 2. Additional Requirement: Notifications
+
 The badge count update functionality will only work if triggered by local notifications or push notifications. Therefore, make sure to trigger the badge count update when a notification is received.
 
-For local notifications, you can use the flutter_local_notifications package or any other method to trigger local notifications.
+- For local notifications, you can use the `flutter_local_notifications` package or any other method to trigger local/push notifications.
+- For push notifications, ensure that your Firebase or other push notification service triggers the badge update when a new push notification is received.
 
-For push notifications, ensure that your Firebase or other push notification service triggers the badge update when a new push notification is received.
+## Usage
 
-Usage
-Update Badge Count
+### Update Badge Count
+
 To update the badge count on supported devices:
 
-dart
-Copy
-Edit
+```dart
 import 'package:app_badger/app_badger.dart';
 
 void _updateBadge() {
   AppBadger.updateBadgeCount(5); // Set badge count to 5
 }
+```
+
 ### Remove Badge
+
 To remove the badge count:
 
-dart
-Copy
-Edit
+```dart
 import 'package:app_badger/app_badger.dart';
 
 void _removeBadge() {
   AppBadger.removeBadge(); // Remove badge
 }
-Check if Badge is Supported
+```
+
+### Check if Badge is Supported
+
 To check if the badge functionality is supported on the device:
 
-dart
-Copy
-Edit
+```dart
 import 'package:app_badger/app_badger.dart';
 
 void _checkBadgeSupport() async {
   bool isSupported = await AppBadger.isBadgeSupported();
   print("Badge supported: $isSupported");
 }
+```
 
 ## Troubleshooting
-Badge Not Showing on Xiaomi Devices: Make sure to add the Xiaomi receiver and permissions in the AndroidManifest.xml as mentioned above.
 
-Badge Not Working: Badge counts may not be supported on all devices, and some device manufacturers require specific permissions or settings.
-
-Notification Badge Only Works After Notification: Ensure that your badge count update is triggered by a notification, whether it’s a local notification or a push notification.
+- **Badge Not Showing on Xiaomi Devices:** Make sure to add the Xiaomi receiver and permissions in the `AndroidManifest.xml` as mentioned above.
+- **Badge Not Working:** Badge counts may not be supported on all devices, and some device manufacturers require specific permissions or settings.
+- **Notification Badge Only Works After Notification:** Ensure that your badge count update is triggered by a notification, whether it’s a local notification or a push notification.
 
 ## Contributing
+
 Feel free to open issues or pull requests for any features or bug fixes.
 
 Let me know if you need further modifications or explanations!
