@@ -9,7 +9,7 @@ To use the app_badger plugin in your Flutter project, add it to your `pubspec.ya
 
 ```yaml
 dependencies:
-  app_badger: ^1.0.0
+  app_badger: ^0.0.1
 ```
 
 Then, run the following command in the terminal:

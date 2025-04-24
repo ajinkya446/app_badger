@@ -1,7 +1,8 @@
 name: app_badger
-description: "A new Flutter plugin project."
+description: "A Flutter plugin to update app badge count on Android (including Xiaomi)."
 version: 0.0.1
-homepage: # You can add a homepage URL here if applicable
+homepage: https://github.com/ajinkya446/app_badger
+repository: https://github.com/ajinkya446/app_badger
 
 environment:
   sdk: ^3.7.2
