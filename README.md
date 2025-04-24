@@ -1,7 +1,7 @@
-app_badger Flutter Plugin
+# app_badger Flutter Plugin
 A Flutter plugin to manage app badge counts on different Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) using the ShortcutBadger library.
 
-Installation
+## Installation
 To use the app_badger plugin in your Flutter project, add it to your pubspec.yaml file:
 
 ```yaml
