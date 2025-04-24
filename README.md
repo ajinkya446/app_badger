@@ -1,31 +1,46 @@
 # app_badger Flutter Plugin
+
 A Flutter plugin to manage app badge counts on different Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) using the ShortcutBadger library.
 
 ## Installation
-To use the app_badger plugin in your Flutter project, add it to your pubspec.yaml file:
+
+Here’s the full README file for the app_badger plugin with all the necessary details:
+
+markdown
+Copy
+Edit
+# app_badger Flutter Plugin
+
+A Flutter plugin to manage app badge counts on different Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) using the ShortcutBadger library.
+
+## Installation
+
+To use the app_badger plugin in your Flutter project, add it to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-app_badger: ^1.0.0
+  app_badger: ^1.0.0
 Then, run the following command in the terminal:
 
-```bash
+bash
+Copy
+Edit
 flutter pub get
-
-
-## Required Setup for Android
+Required Setup for Android
 The plugin requires specific configurations in the AndroidManifest.xml file to ensure compatibility with various device brands (Xiaomi, Samsung, HTC, Sony, Huawei, etc.).
 
-1. Add Permissions and Receiver to AndroidManifest.xml
-   To enable the badge feature on different Android devices, add the following entries inside the <application> tag in your android/app/src/main/AndroidManifest.xml file:
+## 1. Add Permissions and Receiver to AndroidManifest.xml
+To enable the badge feature on different Android devices, add the following entries inside the <application> tag in your android/app/src/main/AndroidManifest.xml file:
 
-```xml
+xml
+Copy
+Edit
 <receiver
-android:name="me.leolin.shortcutbadger.impl.XiaomiHomeBadger"
-android:exported="true">
-<intent-filter>
-<action android:name="android.intent.action.BADGE_COUNT_UPDATE" />
-</intent-filter>
+    android:name="me.leolin.shortcutbadger.impl.XiaomiHomeBadger"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="android.intent.action.BADGE_COUNT_UPDATE" />
+    </intent-filter>
 </receiver>
 
 <!-- Permissions for Xiaomi -->
@@ -67,8 +82,6 @@ android:exported="true">
 <!-- Permissions for EvMe -->
 <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_READ" />
 <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_WRITE" />
-
-
 ## 2. Additional Requirement: Notifications
 The badge count update functionality will only work if triggered by local notifications or push notifications. Therefore, make sure to trigger the badge count update when a notification is received.
 
@@ -76,36 +89,40 @@ For local notifications, you can use the flutter_local_notifications package or 
 
 For push notifications, ensure that your Firebase or other push notification service triggers the badge update when a new push notification is received.
 
-## Usage
-### Update Badge Count
+Usage
+Update Badge Count
 To update the badge count on supported devices:
 
-```dart
+dart
+Copy
+Edit
 import 'package:app_badger/app_badger.dart';
 
 void _updateBadge() {
-    AppBadger.updateBadgeCount(5); // Set badge count to 5
+  AppBadger.updateBadgeCount(5); // Set badge count to 5
 }
-
-## Remove Badge
+### Remove Badge
 To remove the badge count:
 
-```dart
+dart
+Copy
+Edit
 import 'package:app_badger/app_badger.dart';
 
 void _removeBadge() {
-    AppBadger.removeBadge(); // Remove badge
+  AppBadger.removeBadge(); // Remove badge
 }
-
-## Check if Badge is Supported
+Check if Badge is Supported
 To check if the badge functionality is supported on the device:
 
-```dart
+dart
+Copy
+Edit
 import 'package:app_badger/app_badger.dart';
 
 void _checkBadgeSupport() async {
-    bool isSupported = await AppBadger.isBadgeSupported();
-    print("Badge supported: $isSupported");
+  bool isSupported = await AppBadger.isBadgeSupported();
+  print("Badge supported: $isSupported");
 }
 
 ## Troubleshooting
