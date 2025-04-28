@@ -1,7 +1,7 @@
 
 # app_badger Flutter Plugin
 
-A Flutter plugin to manage app badge counts on Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) and iOS devices.
+A Flutter plugin to manage app badge counts on different Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) using the ShortcutBadger library.
 
 ## Installation
 
@@ -85,26 +85,37 @@ The badge count update functionality will only work if triggered by local notifi
 
 ## Required Setup for iOS
 
-For iOS, you need to set up proper permissions for the app to update badge counts and notifications.
-
-### 1. Add Permissions to `Info.plist`
-
-You need to request the user's permission to display notifications and update badge counts. Add the following to your `ios/Runner/Info.plist`:
+In your iOS `Info.plist`, add the following to request permissions for notifications:
 
 ```xml
 <key>UIBackgroundModes</key>
 <array>
-  <string>fetch</string>
-  <string>remote-notification</string>
+    <string>fetch</string>
+    <string>remote-notification</string>
 </array>
-
-<key>UIUserNotificationUsageDescription</key>
-<string>We need permission to send you notifications with updates.</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Your app needs access to location to show notifications</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>Your app needs access to location to show notifications</string>
 ```
 
-### 2. Handle Notifications in iOS
+Additionally, make sure that your `AppDelegate.swift` is properly configured:
 
-Make sure you ask for notification permissions before attempting to update the badge count. This can be done in the `AppBadgerPlugin` as shown in the previous code for iOS.
+```swift
+import UIKit
+import Flutter
+import app_badger  // Import the plugin here
+
+@main
+@objc class AppDelegate: FlutterAppDelegate {
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        GeneratedPluginRegistrant.register(with: self) // Register the Flutter plugins
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+}
+```
 
 ## Usage
 
@@ -148,7 +159,6 @@ void _checkBadgeSupport() async {
 ## Troubleshooting
 
 - **Badge Not Showing on Xiaomi Devices:** Make sure to add the Xiaomi receiver and permissions in the `AndroidManifest.xml` as mentioned above.
-- **Badge Not Working on iOS:** Make sure you have added the necessary permissions in your `Info.plist` as outlined above and that the user has allowed notifications.
 - **Badge Not Working:** Badge counts may not be supported on all devices, and some device manufacturers require specific permissions or settings.
 - **Notification Badge Only Works After Notification:** Ensure that your badge count update is triggered by a notification, whether it’s a local notification or a push notification.
 
