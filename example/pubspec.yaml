@@ -12,13 +12,12 @@ dependencies:
   awesome_notifications: any
   app_badger:
     path: ../
-  cupertino_icons: ^1.0.8  # Ensure null safety
+  cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0  # For better linting and code quality
+  flutter_lints: ^5.0.0
 
 flutter:
-  uses-material-design: true  # Ensures Material Design icons are included in the app
-  assets:
+  uses-material-design: true

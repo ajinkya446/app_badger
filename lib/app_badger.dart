@@ -9,8 +9,8 @@ class AppBadger {
   static Future<void> updateBadgeCount(int count) async {
     try {
       await _channel.invokeMethod('updateBadgeCount', {"count": count});
-    } on PlatformException catch (e) {
-      print("Failed to update badge count: ${e.message}");
+    } on PlatformException {
+      return;
     }
   }
 
@@ -18,8 +18,8 @@ class AppBadger {
   static Future<void> removeBadge() async {
     try {
       await _channel.invokeMethod('removeBadge');
-    } on PlatformException catch (e) {
-      print("Failed to remove badge count: ${e.message}");
+    } on PlatformException {
+      rethrow;
     }
   }
 
@@ -47,8 +47,8 @@ class AppBadger {
   static Future<void> openNotificationSettings() async {
     try {
       await _channel.invokeMethod('openNotificationSettings');
-    } on PlatformException catch (e) {
-      print("Failed to open notification settings: ${e.message}");
+    } on PlatformException {
+      rethrow;
     }
   }
 }
