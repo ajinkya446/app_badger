@@ -27,7 +27,3 @@ flutter:
       ios:
         pluginClass: AppBadgerPlugin
 
-# Changelog and version notes
-changelog:
-  - "0.0.1: Initial release with Android badge notification support."
-  - "0.0.2: Added iOS badge notification setup and configuration."
