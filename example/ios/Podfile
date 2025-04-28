@@ -1,0 +1,20 @@
+# Platform version
+platform :ios, '12.0'
+
+# CocoaPods configurations
+use_frameworks! :linkage => :static
+use_modular_headers!
+
+# Setup Flutter
+flutter_root = ENV['FLUTTER_ROOT'] || File.expand_path('~/flutter')
+load File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+
+target 'Runner' do
+  flutter_install_all_ios_pods(File.dirname(File.realpath(__FILE__)))
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+  end
+end

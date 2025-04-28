@@ -1,7 +1,7 @@
 
 # app_badger Flutter Plugin
 
-A Flutter plugin to manage app badge counts on different Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) using the ShortcutBadger library.
+A Flutter plugin to manage app badge counts on Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) and iOS devices.
 
 ## Installation
 
@@ -83,6 +83,29 @@ The badge count update functionality will only work if triggered by local notifi
 - For local notifications, you can use the `flutter_local_notifications` package or any other method to trigger local/push notifications.
 - For push notifications, ensure that your Firebase or other push notification service triggers the badge update when a new push notification is received.
 
+## Required Setup for iOS
+
+For iOS, you need to set up proper permissions for the app to update badge counts and notifications.
+
+### 1. Add Permissions to `Info.plist`
+
+You need to request the user's permission to display notifications and update badge counts. Add the following to your `ios/Runner/Info.plist`:
+
+```xml
+<key>UIBackgroundModes</key>
+<array>
+  <string>fetch</string>
+  <string>remote-notification</string>
+</array>
+
+<key>UIUserNotificationUsageDescription</key>
+<string>We need permission to send you notifications with updates.</string>
+```
+
+### 2. Handle Notifications in iOS
+
+Make sure you ask for notification permissions before attempting to update the badge count. This can be done in the `AppBadgerPlugin` as shown in the previous code for iOS.
+
 ## Usage
 
 ### Update Badge Count
@@ -125,11 +148,10 @@ void _checkBadgeSupport() async {
 ## Troubleshooting
 
 - **Badge Not Showing on Xiaomi Devices:** Make sure to add the Xiaomi receiver and permissions in the `AndroidManifest.xml` as mentioned above.
+- **Badge Not Working on iOS:** Make sure you have added the necessary permissions in your `Info.plist` as outlined above and that the user has allowed notifications.
 - **Badge Not Working:** Badge counts may not be supported on all devices, and some device manufacturers require specific permissions or settings.
 - **Notification Badge Only Works After Notification:** Ensure that your badge count update is triggered by a notification, whether it’s a local notification or a push notification.
 
 ## Contributing
 
 Feel free to open issues or pull requests for any features or bug fixes.
-
-Let me know if you need further modifications or explanations!

@@ -1,12 +1,12 @@
 name: app_badger
-description: "A Flutter plugin to update app badge count on Android (including Xiaomi)."
-version: 0.0.1
+description: "A Flutter plugin to update app badge count on Android (including Xiaomi devices) and iOS. This plugin allows you to set and remove app icon badges on supported platforms."
+version: 0.0.2
 homepage: https://github.com/ajinkya446/app_badger
 repository: https://github.com/ajinkya446/app_badger
 
 environment:
-  sdk: ^3.7.2
-  flutter: '>=3.3.0'
+  sdk: ">=3.7.2 <4.0.0"
+  flutter: ">=3.3.0"
 
 dependencies:
   flutter:
@@ -23,4 +23,6 @@ flutter:
     platforms:
       android:
         package: com.ajinkya.app_badger
+        pluginClass: AppBadgerPlugin
+      ios:
         pluginClass: AppBadgerPlugin
