@@ -69,18 +69,88 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(title: const Text('Badge Example App')),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Badge supported: $_appBadgeSupported\n'),
-              Text('Badge status: $_badgeStatus\n', style: TextStyle(fontWeight: FontWeight.bold)),
-              ElevatedButton(onPressed: _addBadge, child: const Text('Add badge')),
-              ElevatedButton(onPressed: _removeBadge, child: const Text('Remove badge')),
-              const SizedBox(height: 10),
-              ElevatedButton(onPressed: _checkNotificationPermission, child: const Text('Check Notification Enabled')),
-              ElevatedButton(onPressed: _openNotificationSettings, child: const Text('Open Notification Settings')),
-            ],
+        body: GlassMorphismContainer(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('Badge supported: $_appBadgeSupported\n'),
+                Text('Badge status: $_badgeStatus\n', style: TextStyle(fontWeight: FontWeight.bold)),
+                GlassMorphismContainer(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                  borderRadius: 24.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
+                    ),
+                    onPressed: _addBadge,
+                    child: const Text('Add badge'),
+                  ),
+                ),
+                GlassMorphismContainer(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                  borderRadius: 24.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
+                    ),
+                    onPressed: _removeBadge,
+                    child: const Text('Remove badge'),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                GlassMorphismContainer(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                  borderRadius: 24.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
+                    ),
+                    onPressed: _checkNotificationPermission,
+                    child: const Text('Check Notification Enabled'),
+                  ),
+                ),
+                GlassMorphismContainer(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                  borderRadius: 24.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
+                    ),
+                    onPressed: _openNotificationSettings,
+                    child: const Text('Open Notification Settings'),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    Icon(Icons.notifications, size: 48),
+                    GlassMorphismBadge(count: 7),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

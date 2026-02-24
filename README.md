@@ -1,7 +1,12 @@
-
 # app_badger Flutter Plugin
 
 A Flutter plugin to manage app badge counts on different Android devices (including Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, and others) using the ShortcutBadger library.
+
+## Version 0.0.3 Highlights
+- Glassmorphism badge widget for in-app overlays (`GlassMorphismBadge`).
+- Glassmorphism container widget for frosted glass UI backgrounds (`GlassMorphismContainer`).
+- Consistent MethodChannel name (`app_badger`) for plugin registration.
+- Improved design system for badges and UI overlays.
 
 ## Installation
 
@@ -9,7 +14,15 @@ To use the app_badger plugin in your Flutter project, add it to your `pubspec.ya
 
 ```yaml
 dependencies:
-  app_badger: ^0.0.1
+  app_badger: ^0.0.3
+```
+
+Or for local development:
+
+```yaml
+dependencies:
+  app_badger:
+    path: ../
 ```
 
 Then, run the following command in the terminal:
@@ -24,7 +37,7 @@ The plugin requires specific configurations in the `AndroidManifest.xml` file to
 
 ### 1. Add Permissions and Receiver to `AndroidManifest.xml`
 
-To enable the badge feature on different Android devices, add the following entries inside the `<application>` tag in your `android/app/src/main/AndroidManifest.xml` file:
+Add the required permissions and receiver entries inside the `<application>` tag in your `android/app/src/main/AndroidManifest.xml` file:
 
 ```xml
 <receiver
@@ -78,44 +91,11 @@ To enable the badge feature on different Android devices, add the following entr
 
 ### 2. Additional Requirement: Notifications
 
-The badge count update functionality will only work if triggered by local notifications or push notifications. Therefore, make sure to trigger the badge count update when a notification is received.
-
-- For local notifications, you can use the `flutter_local_notifications` package or any other method to trigger local/push notifications.
-- For push notifications, ensure that your Firebase or other push notification service triggers the badge update when a new push notification is received.
+Badge count updates should be triggered by local or push notifications.
 
 ## Required Setup for iOS
 
-In your iOS `Info.plist`, add the following to request permissions for notifications:
-
-```xml
-<key>UIBackgroundModes</key>
-<array>
-    <string>fetch</string>
-    <string>remote-notification</string>
-</array>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>Your app needs access to location to show notifications</string>
-<key>NSLocationAlwaysUsageDescription</key>
-<string>Your app needs access to location to show notifications</string>
-```
-
-Additionally, make sure that your `AppDelegate.swift` is properly configured:
-
-```swift
-import UIKit
-import Flutter
-import app_badger  // Import the plugin here
-
-@main
-@objc class AppDelegate: FlutterAppDelegate {
-    override func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        GeneratedPluginRegistrant.register(with: self) // Register the Flutter plugins
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-    }
-}
-```
+Add notification permissions to your `Info.plist` and ensure plugin registration in `AppDelegate.swift`.
 
 ## Usage
 
@@ -156,11 +136,44 @@ void _checkBadgeSupport() async {
 }
 ```
 
+### Glassmorphism Badge (In-App UI)
+
+For using the glassmorphism badge in your app's UI:
+
+```dart
+import 'package:app_badger/app_badger.dart';
+
+Stack(
+  alignment: Alignment.topRight,
+  children: [
+    Icon(Icons.notifications, size: 48),
+    GlassMorphismBadge(count: 7),
+  ],
+)
+```
+
+### Glassmorphism Container (UI Backgrounds)
+
+For using the glassmorphism container in your app's UI:
+
+```dart
+import 'package:app_badger/app_badger.dart';
+
+GlassMorphismContainer(
+  child: Column(
+    children: [
+      // ...your widgets...
+    ],
+  ),
+)
+```
+
 ## Troubleshooting
 
-- **Badge Not Showing on Xiaomi Devices:** Make sure to add the Xiaomi receiver and permissions in the `AndroidManifest.xml` as mentioned above.
-- **Badge Not Working:** Badge counts may not be supported on all devices, and some device manufacturers require specific permissions or settings.
-- **Notification Badge Only Works After Notification:** Ensure that your badge count update is triggered by a notification, whether it’s a local notification or a push notification.
+- **MissingPluginException:** Ensure the MethodChannel name is `app_badger` in both Dart and native code. Do a full restart after plugin changes.
+- **Badge Not Showing on Xiaomi Devices:** Add Xiaomi receiver and permissions in `AndroidManifest.xml`.
+- **Badge Not Working:** Badge counts may not be supported on all devices; check permissions and settings.
+- **Notification Badge Only Works After Notification:** Badge updates should be triggered by notifications.
 
 ## Contributing
 
