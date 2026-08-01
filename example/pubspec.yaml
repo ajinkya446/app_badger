@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  app_badger: ^2.0.1
+  app_badger: ^2.0.2
   cupertino_icons: ^1.0.8
   meta: ^1.17.0
 
