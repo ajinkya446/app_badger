@@ -1,6 +1,7 @@
 name: app_badger_example
 description: "Demonstrates how to use the app_badger plugin."
 version: 1.0.0+1
+publish_to: none
 
 environment:
   sdk: ">=3.7.2 <4.0.0"  # Ensure Dart SDK compatibility
