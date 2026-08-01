@@ -9,7 +9,7 @@ let package = Package(
         .iOS("13.0")
     ],
     products: [
-        .library(name: "app-badger", targets: ["app_badger"])
+        .library(name: "app_badger", targets: ["app_badger"])
     ],
     dependencies: [
         .package(name: "FlutterFramework", path: "../FlutterFramework")

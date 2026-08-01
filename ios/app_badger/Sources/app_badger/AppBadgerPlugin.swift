@@ -3,8 +3,8 @@ import UIKit
 import UserNotifications
 
 public class AppBadgerPlugin: NSObject, FlutterPlugin {
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "app_badger", binaryMessenger: registrar.messenger())
+    public static func register(with registrar: FlutterPluginRegistry) {
+        let channel = FlutterMethodChannel(name: "app_badger", binaryMessenger: registrar.messenger() as! FlutterBinaryMessenger)
         let instance = AppBadgerPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
@@ -65,35 +65,14 @@ public class AppBadgerPlugin: NSObject, FlutterPlugin {
         case "isBadgeSupported":
             DispatchQueue.main.async {
                 if UIApplication.shared.isRegisteredForRemoteNotifications {
-                    result(true)
+                   result(true)
                 } else {
-                    result(false)
+                   result(false)
                 }
             }
-
-        case "requestNotificationPermission":
-            requestNotificationPermission(result: result)
 
         default:
             result(FlutterMethodNotImplemented)
-        }
-    }
-
-    private func requestNotificationPermission(result: @escaping FlutterResult) {
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .sound, .alert]) { granted, error in
-                DispatchQueue.main.async {
-                    if let error = error {
-                        result(FlutterError(code: "PERMISSION_ERROR", message: "Failed to request notification permission", details: error.localizedDescription))
-                    } else {
-                        result(granted)
-                    }
-                }
-            }
-        } else {
-            let settings = UIUserNotificationSettings(types: [.badge, .sound, .alert], categories: nil)
-            UIApplication.shared.registerUserNotificationSettings(settings)
-            result(true)
         }
     }
 
@@ -104,5 +83,9 @@ public class AppBadgerPlugin: NSObject, FlutterPlugin {
             let settings = UIUserNotificationSettings(types: [.badge, .sound, .alert], categories: nil)
             UIApplication.shared.registerUserNotificationSettings(settings)
         }
+    }
+
+    public func dummyMethodToEnforceBundling() {
+        // This method is intentionally left empty.
     }
 }
