@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1] - 2026-08-02
+
+### Fixed
+- **iOS SPM Support**: Removed unnecessary Package.swift that was causing conflicts. Flutter handles SPM plugin integration automatically.
+- **Resolved package identity conflicts**: Fixes "unable to override package" errors when using app_badger with pub.dev
+- **Improved build reliability**: Cleaner iOS build system leveraging Flutter's automatic SPM handling
+
 ## [2.0.0] - 2026-08-01
 
 ### Added
