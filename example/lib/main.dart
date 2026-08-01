@@ -1,32 +1,9 @@
 import 'package:app_badger/app_badger.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-void main() async{
-  AwesomeNotifications().initialize(
-    // set the icon to null if you want to use the default app icon
-    'resource://drawable/logo',
-    [
-      NotificationChannel(
-        channelGroupKey: 'basic_channel_group',
-        channelKey: 'basic_channel',
-        channelName: 'Basic notifications',
-        channelDescription: 'Notification channel for basic tests',
-        defaultColor: Color(0xFF9D50DD),
-        ledColor: Colors.white,
-      ),
-    ],
-    // Channel groups are only visual and are not required
-    channelGroups: [NotificationChannelGroup(channelGroupKey: 'basic_channel_group', channelGroupName: 'Basic group')],
-    debug: true,
-  );
-  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-  if (!isAllowed) {
-    await AwesomeNotifications().requestPermissionToSendNotifications();
-  }
-
-  runApp(MyApp());
+void main() {
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -39,12 +16,26 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _appBadgeSupported = 'Unknown';
   String _badgeStatus = '';
+  String _permissionStatus = 'Checking...';
 
   @override
   void initState() {
     super.initState();
-
     initPlatformState();
+    requestNotificationPermission();
+  }
+
+  Future<void> requestNotificationPermission() async {
+    try {
+      bool granted = await AppBadger.requestNotificationPermission();
+      setState(() {
+        _permissionStatus = granted ? 'Permission granted' : 'Permission denied';
+      });
+    } on PlatformException {
+      setState(() {
+        _permissionStatus = 'Failed to request permission';
+      });
+    }
   }
 
   Future<void> initPlatformState() async {
@@ -75,6 +66,7 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text('Badge supported: $_appBadgeSupported\n'),
+                Text('Permission status: $_permissionStatus\n', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
                 Text('Badge status: $_badgeStatus\n', style: TextStyle(fontWeight: FontWeight.bold)),
                 GlassMorphismContainer(
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
@@ -159,9 +151,6 @@ class _MyAppState extends State<MyApp> {
 
   void _addBadge() async {
     try {
-      AwesomeNotifications().createNotification(
-        content: NotificationContent(id: 10, channelKey: 'basic_channel', title: 'Hello from Awesome Notifications!', body: 'This is a custom notification created using Awesome Notifications.'),
-      );
       await AppBadger.updateBadgeCount(1);
       setState(() {
         _badgeStatus = "Badge count added successfully!";

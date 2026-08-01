@@ -38,6 +38,9 @@
     <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_READ" />
     <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_WRITE" />
 
+    <!-- Required on Android 13+ for notification-based badge updates -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
@@ -68,13 +71,6 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <receiver
-            android:name="me.leolin.shortcutbadger.impl.XiaomiHomeBadger"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BADGE_COUNT_UPDATE" />
-            </intent-filter>
-        </receiver>
     </application>
 
 

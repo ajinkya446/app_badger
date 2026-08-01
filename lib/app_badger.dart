@@ -55,6 +55,17 @@ class AppBadger {
       rethrow;
     }
   }
+
+  /// Requests POST_NOTIFICATIONS permission (Android 13+) and notification permission (iOS)
+  /// Returns true if permission was granted, false otherwise
+  static Future<bool> requestNotificationPermission() async {
+    try {
+      final bool result = await _channel.invokeMethod('requestNotificationPermission');
+      return result;
+    } on PlatformException catch (_) {
+      return false;
+    }
+  }
 }
 
 /// GlassMorphismBadge widget for notification counts.
@@ -69,14 +80,14 @@ class GlassMorphismBadge extends StatelessWidget {
   final TextStyle? textStyle;
 
   const GlassMorphismBadge({
-    Key? key,
+    super.key,
     required this.count,
     this.size = 24.0,
     this.color = const Color(0x66FFFFFF), // semi-transparent white
     this.blur = 8.0,
     this.borderRadius = 12.0,
     this.textStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +139,7 @@ class GlassMorphismContainer extends StatelessWidget {
   final EdgeInsetsGeometry padding;
 
   const GlassMorphismContainer({
-    Key? key,
+    super.key,
     required this.child,
     this.blur = 12.0,
     this.color = const Color(0x66FFFFFF),
@@ -136,7 +147,7 @@ class GlassMorphismContainer extends StatelessWidget {
     this.borderWidth = 1.0,
     this.borderColor = const Color(0x33FFFFFF),
     this.padding = const EdgeInsets.all(16),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
