@@ -27,4 +27,3 @@ flutter:
         pluginClass: AppBadgerPlugin
       ios:
         pluginClass: AppBadgerPlugin
-        ffiPlugin: false

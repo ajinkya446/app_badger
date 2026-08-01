@@ -4,11 +4,10 @@ packages:
   app_badger:
     dependency: "direct main"
     description:
-      name: app_badger
-      sha256: ad24490053e2f48493bc731a4bcc7e8f714adeca7e624fa7270672a02ea37fbb
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
+      path: ".."
+      relative: true
+    source: path
+    version: "2.0.1"
   async:
     dependency: transitive
     description:
