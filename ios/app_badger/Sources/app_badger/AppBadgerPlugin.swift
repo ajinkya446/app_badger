@@ -71,8 +71,29 @@ public class AppBadgerPlugin: NSObject, FlutterPlugin {
                 }
             }
 
+        case "requestNotificationPermission":
+            requestNotificationPermission(result: result)
+
         default:
             result(FlutterMethodNotImplemented)
+        }
+    }
+
+    private func requestNotificationPermission(result: @escaping FlutterResult) {
+        if #available(iOS 10.0, *) {
+            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .sound, .alert]) { granted, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        result(FlutterError(code: "PERMISSION_ERROR", message: "Failed to request notification permission", details: error.localizedDescription))
+                    } else {
+                        result(granted)
+                    }
+                }
+            }
+        } else {
+            let settings = UIUserNotificationSettings(types: [.badge, .sound, .alert], categories: nil)
+            UIApplication.shared.registerUserNotificationSettings(settings)
+            result(true)
         }
     }
 

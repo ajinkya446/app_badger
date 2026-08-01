@@ -66,5 +66,7 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>Notifications are required to display app badges</string>
 </dict>
 </plist>

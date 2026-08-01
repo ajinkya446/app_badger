@@ -7,17 +7,23 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import me.leolin.shortcutbadger.ShortcutBadger
 
-class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
+class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware {
 
     private var applicationContext: Context? = null
     private var channel: MethodChannel? = null
+    private var activityBinding: ActivityPluginBinding? = null
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME)
@@ -28,6 +34,22 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel?.setMethodCallHandler(null)
         applicationContext = null
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activityBinding = binding
+    }
+
+    override fun onDetachedFromActivity() {
+        activityBinding = null
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        activityBinding = binding
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        activityBinding = null
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -78,6 +100,10 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
             "isBadgeSupported" -> {
                 checkIfBadgeSupported(applicationContext!!, result)
+            }
+
+            "requestNotificationPermission" -> {
+                requestNotificationPermission(result)
             }
 
             else -> result.notImplemented()
@@ -194,9 +220,38 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         result.success(isSupported)
     }
 
+    private fun requestNotificationPermission(result: MethodChannel.Result) {
+        Log.d("AppBadger", "requestNotificationPermission called")
+        
+        val activity = activityBinding?.activity
+        if (activity == null) {
+            Log.w("AppBadger", "Activity is not available, assuming permission already granted")
+            result.success(true)
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permission = android.Manifest.permission.POST_NOTIFICATIONS
+            val hasPermission = ContextCompat.checkSelfPermission(activity, permission) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            
+            if (hasPermission) {
+                Log.d("AppBadger", "POST_NOTIFICATIONS permission already granted")
+                result.success(true)
+            } else {
+                Log.d("AppBadger", "Requesting POST_NOTIFICATIONS permission")
+                ActivityCompat.requestPermissions(activity, arrayOf(permission), NOTIFICATION_PERMISSION_REQUEST_CODE)
+                result.success(false)
+            }
+        } else {
+            Log.d("AppBadger", "Android version < 13, POST_NOTIFICATIONS not required")
+            result.success(true)
+        }
+    }
+
     companion object {
         private const val CHANNEL_NAME = "app_badger"
         private const val BADGE_NOTIFICATION_ID = 1001
         private const val BADGE_CHANNEL_ID = "app_badger_badges"
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
     }
 }

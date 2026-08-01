@@ -16,12 +16,26 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _appBadgeSupported = 'Unknown';
   String _badgeStatus = '';
+  String _permissionStatus = 'Checking...';
 
   @override
   void initState() {
     super.initState();
-
     initPlatformState();
+    requestNotificationPermission();
+  }
+
+  Future<void> requestNotificationPermission() async {
+    try {
+      bool granted = await AppBadger.requestNotificationPermission();
+      setState(() {
+        _permissionStatus = granted ? 'Permission granted' : 'Permission denied';
+      });
+    } on PlatformException {
+      setState(() {
+        _permissionStatus = 'Failed to request permission';
+      });
+    }
   }
 
   Future<void> initPlatformState() async {
@@ -52,6 +66,7 @@ class _MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text('Badge supported: $_appBadgeSupported\n'),
+                Text('Permission status: $_permissionStatus\n', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
                 Text('Badge status: $_badgeStatus\n', style: TextStyle(fontWeight: FontWeight.bold)),
                 GlassMorphismContainer(
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),

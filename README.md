@@ -86,11 +86,16 @@ Add the needed permissions inside the `<manifest>` tag in your `android/app/src/
 
 ### 2. Additional Requirement: Notifications
 
-Badge count updates should be triggered by local or push notifications.
+Badge count updates should be triggered by local or push notifications. Call `AppBadger.requestNotificationPermission()` on app startup to ensure permissions are granted.
 
 ## Required Setup for iOS
 
-Add notification permissions to your `Info.plist` and ensure plugin registration in `AppDelegate.swift`.
+The plugin automatically requests notification permissions when `AppBadger.requestNotificationPermission()` is called. Ensure your `Info.plist` includes the notification usage description:
+
+```xml
+<key>NSUserNotificationUsageDescription</key>
+<string>Notifications are required to display app badges</string>
+```
 
 ## Usage
 
@@ -118,7 +123,28 @@ void _removeBadge() {
 }
 ```
 
-### Check if Badge is Supported
+### Request Notification Permission
+
+To request POST_NOTIFICATIONS permission (Android 13+) and notification permission (iOS):
+
+```dart
+import 'package:app_badger/app_badger.dart';
+
+void _requestPermission() async {
+  bool granted = await AppBadger.requestNotificationPermission();
+  print("Permission granted: $granted");
+}
+```
+
+This method:
+- **Android 13+**: Requests the `POST_NOTIFICATIONS` permission at runtime
+- **Android <13**: Returns true (permission not required)
+- **iOS**: Requests notification permission with badge, sound, and alert options
+- Returns `true` if permission was granted, `false` otherwise
+
+**Recommended**: Call this method when your app first launches to ensure badge notifications work properly.
+
+### Check Notification Status
 
 To check if the badge functionality is supported on the device:
 

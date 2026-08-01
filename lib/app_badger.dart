@@ -55,6 +55,17 @@ class AppBadger {
       rethrow;
     }
   }
+
+  /// Requests POST_NOTIFICATIONS permission (Android 13+) and notification permission (iOS)
+  /// Returns true if permission was granted, false otherwise
+  static Future<bool> requestNotificationPermission() async {
+    try {
+      final bool result = await _channel.invokeMethod('requestNotificationPermission');
+      return result;
+    } on PlatformException catch (_) {
+      return false;
+    }
+  }
 }
 
 /// GlassMorphismBadge widget for notification counts.
