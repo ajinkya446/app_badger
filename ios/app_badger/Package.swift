@@ -9,20 +9,11 @@ let package = Package(
             targets: ["app_badger"]
         ),
     ],
-    dependencies: [
-        .package(
-            name: "FlutterFramework",
-            url: "https://github.com/flutter/engine",
-            .upToNextMajor(from: "1.0.0")
-        ),
-    ],
     targets: [
         .target(
             name: "app_badger",
-            dependencies: [
-                .product(name: "Flutter", package: "FlutterFramework"),
-            ],
-            path: "Sources/app_badger"
+            dependencies: [],
+            path: "../Classes"
         ),
     ]
 )
