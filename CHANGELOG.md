@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1] - 2026-08-02
+
+### Fixed
+- **iOS SPM package identity conflict**: Removed Package.swift from plugin directory that caused "unable to override package 'app_badger' because its identity 'app_badger-2.0.0' doesn't match override's identity" error
+- **Local path dependency support**: Plugin now works correctly when used as `path:` dependency in local projects
+- **Example app build**: Resolved SPM resolution errors when building example app locally
+
 ## [2.0.0] - 2026-08-01
 
 ### Added
