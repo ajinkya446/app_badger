@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.4] - 2026-08-02
+
+### Fixed
+- **iOS SPM Package Identity**: Corrected Package.swift to use `app-badger` (hyphen) as package name, matching Flutter's SPM convention. This resolves "Plugin does not support Swift Package Manager for ios" warnings.
+- **Complete SPM Support**: Restored Package.swift with proper product declarations for Flutter 3.22+ compatibility.
+
+## [2.0.3] - 2026-08-02
+
+### Fixed
+- **iOS SPM Package Identity**: Corrected Package.swift to use `app-badger` (hyphen) as package name, matching Flutter's SPM convention. This resolves "Plugin does not support Swift Package Manager for ios" warnings.
+- **Complete SPM Support**: Restored Package.swift with proper product declarations for Flutter 3.22+ compatibility.
+
+
 ## [2.0.2] - 2026-08-02
 
 ### Fixed
