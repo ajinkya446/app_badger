@@ -33,22 +33,17 @@ flutter pub get
 
 ## Required Setup for Android
 
-The plugin requires specific configurations in the `AndroidManifest.xml` file to ensure compatibility with various device brands (Xiaomi, Samsung, HTC, Sony, Huawei, etc.).
+The plugin now uses a notification-based fallback alongside ShortcutBadger so badges can be updated more reliably on modern Android devices.
 
-### 1. Add Permissions and Receiver to `AndroidManifest.xml`
+### 1. Add Required Permissions to `AndroidManifest.xml`
 
-Add the required permissions and receiver entries inside the `<application>` tag in your `android/app/src/main/AndroidManifest.xml` file:
+Add the needed permissions inside the `<manifest>` tag in your `android/app/src/main/AndroidManifest.xml` file:
 
 ```xml
-<receiver
-    android:name="me.leolin.shortcutbadger.impl.XiaomiHomeBadger"
-    android:exported="true">
-    <intent-filter>
-        <action android:name="android.intent.action.BADGE_COUNT_UPDATE" />
-    </intent-filter>
-</receiver>
+<!-- Required on Android 13+ for notification-based badge updates -->
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-<!-- Permissions for Xiaomi -->
+<!-- Optional launcher permissions for device-specific badge support -->
 <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
 <uses-permission android:name="com.android.launcher.permission.WRITE_SETTINGS" />
 <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
@@ -168,12 +163,63 @@ GlassMorphismContainer(
 )
 ```
 
+## Known Limitations
+
+### Android Background Badge Disappearance
+On Android, app icon badges may disappear when the app enters the background on certain devices/launchers. This is a known platform limitation:
+
+- **Root Cause:** Many Android launchers only refresh badge visibility when the app process is active (in foreground). When your app backgrounded, the launcher may clear the badge display even though the badge count is internally stored.
+- **Affected Devices:** This behavior is launcher-dependent (Stock Android, Samsung, MIUI, OnePlus, etc. all handle badges differently).
+- **Workaround:** Ensure notifications are enabled:
+  1. Check device notification settings for your app
+  2. Verify `POST_NOTIFICATIONS` permission is granted (Android 13+)
+  3. Consider using push notifications to "refresh" the badge when needed
+  4. Some launchers have badge visibility settings in launcher preferences
+
+### Device-Specific Support
+Badge functionality varies significantly across Android devices:
+- Stock Android Launcher: Full badge support via notification
+- Samsung: Requires specific `com.sec.android.provider.badge` permissions
+- Xiaomi MIUI: Requires broadcast integration
+- Other devices (HTC, Sony, OPPO, etc.): Requires device-specific permissions and broadcast receivers
+
+## Debugging Badge Issues
+
+To debug badge issues, check the logcat output after running your app:
+
+```bash
+# View all app_badger logs
+flutter logs | grep AppBadger
+
+# Clear device logs and run
+flutter logcat -c
+flutter run
+# Then in another terminal:
+flutter logs | grep AppBadger
+```
+
+You'll see logs like:
+```
+AppBadger: applyBadgeCount called with count=5
+AppBadger: Attempting ShortcutBadger.applyCount for count=5
+AppBadger: ShortcutBadger.applyCount result: true
+AppBadger: Notifications enabled: true
+AppBadger: Posting badge notification with count=5
+AppBadger: Badge notification posted successfully
+```
+
+If you see:
+- `ShortcutBadger.applyCount result: false` - Device/launcher doesn't support badges
+- `Notifications enabled: false` - Notifications are disabled, badge will only use ShortcutBadger broadcast
+- `Failed to post badge notification` - Permission or system issue preventing notification posting
+
 ## Troubleshooting
 
 - **MissingPluginException:** Ensure the MethodChannel name is `app_badger` in both Dart and native code. Do a full restart after plugin changes.
 - **Badge Not Showing on Xiaomi Devices:** Add Xiaomi receiver and permissions in `AndroidManifest.xml`.
-- **Badge Not Working:** Badge counts may not be supported on all devices; check permissions and settings.
-- **Notification Badge Only Works After Notification:** Badge updates should be triggered by notifications.
+- **Badge Not Working:** Badge counts may not be supported on all devices; check permissions and settings. Use the debugging logs to verify which path is failing.
+- **Badge Disappears in Background:** This is a known Android limitation (see "Known Limitations"). Check launcher badge settings and ensure notifications are enabled.
+- **Notification Badge Only Works After Notification:** Badge updates should be triggered by notifications or app lifecycle events.
 
 ## Contributing
 

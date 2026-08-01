@@ -43,17 +43,14 @@ flutter pub get
 
 ## Android Setup
 
-Add the following permissions and receiver to your `AndroidManifest.xml`:
+Add the required permissions to your `AndroidManifest.xml`:
 
 ```xml
-<receiver
-    android:name="me.leolin.shortcutbadger.impl.XiaomiHomeBadger"
-    android:exported="true">
-    <intent-filter>
-        <action android:name="android.intent.action.BADGE_COUNT_UPDATE" />
-    </intent-filter>
-</receiver>
-<!-- ...other permissions for Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, etc... -->
+<!-- Required on Android 13+ for notification-based badge updates -->
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+<!-- Optional launcher permissions for device-specific badge support -->
+<!-- Permissions for Xiaomi, Samsung, HTC, Sony, Huawei, OPPO, etc. -->
 ```
 
 Badge updates should be triggered by notifications (local or push).
@@ -110,7 +107,7 @@ GlassMorphismContainer(
 ## Troubleshooting
 
 - **MissingPluginException**: Ensure MethodChannel name is `app_badger` in Dart and native code. Do a full restart after plugin changes.
-- **Badge Not Showing on Xiaomi Devices**: Add Xiaomi receiver and permissions in `AndroidManifest.xml`.
+- **Badge Not Showing on Xiaomi Devices**: Add the required launcher permissions in `AndroidManifest.xml` and verify that the launcher supports badge updates.
 - **Badge Not Working**: Badge counts may not be supported on all devices; check permissions and settings.
 - **Notification Badge Only Works After Notification**: Badge updates should be triggered by notifications.
 

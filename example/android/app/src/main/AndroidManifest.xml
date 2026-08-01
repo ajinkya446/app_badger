@@ -68,13 +68,6 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <receiver
-            android:name="me.leolin.shortcutbadger.impl.XiaomiHomeBadger"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BADGE_COUNT_UPDATE" />
-            </intent-filter>
-        </receiver>
     </application>
 
 

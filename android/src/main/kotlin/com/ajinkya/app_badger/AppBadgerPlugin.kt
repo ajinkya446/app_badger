@@ -1,10 +1,13 @@
 package com.ajinkya.app_badger
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
@@ -30,10 +33,16 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "updateBadgeCount" -> {
+                val context = applicationContext
+                val count = call.argument<Int>("count") ?: 0
+
+                if (context == null) {
+                    result.error("BADGE_ERROR", "Application context is unavailable", null)
+                    return
+                }
+
                 try {
-                    val count = call.argument<Int>("count") ?: 0
-                    val success = ShortcutBadger.applyCount(applicationContext!!, count)
-                    Log.d("ShortcutBadger", "Badge count applied: $success, Count: $count")
+                    applyBadgeCount(context, count)
                     result.success(null)
                 } catch (e: Exception) {
                     Log.e("ShortcutBadger", "Failed to apply badge count", e)
@@ -42,9 +51,15 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }
 
             "removeBadge" -> {
+                val context = applicationContext
+
+                if (context == null) {
+                    result.error("BADGE_ERROR", "Application context is unavailable", null)
+                    return
+                }
+
                 try {
-                    ShortcutBadger.removeCount(applicationContext!!)
-                    Log.d("ShortcutBadger", "Badge count removed successfully")
+                    clearBadge(context)
                     result.success(null)
                 } catch (e: Exception) {
                     Log.e("ShortcutBadger", "Failed to remove badge count", e)
@@ -66,6 +81,91 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             }
 
             else -> result.notImplemented()
+        }
+    }
+
+    private fun applyBadgeCount(context: Context, count: Int) {
+        Log.d("AppBadger", "applyBadgeCount called with count=$count")
+        
+        if (count <= 0) {
+            Log.d("AppBadger", "Count is 0 or negative, clearing badge")
+            clearBadge(context)
+            return
+        }
+
+        try {
+            Log.d("AppBadger", "Attempting ShortcutBadger.applyCount for count=$count")
+            val success = ShortcutBadger.applyCount(context, count)
+            Log.d("AppBadger", "ShortcutBadger.applyCount result: $success")
+        } catch (e: Exception) {
+            Log.e("AppBadger", "ShortcutBadger.applyCount failed", e)
+        }
+
+        val notificationsEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            NotificationManagerCompat.from(context).areNotificationsEnabled()
+        } else {
+            true
+        }
+
+        Log.d("AppBadger", "Notifications enabled: $notificationsEnabled")
+
+        if (notificationsEnabled) {
+            try {
+                val notification = buildBadgeNotification(context, count)
+                Log.d("AppBadger", "Posting badge notification with count=$count")
+                NotificationManagerCompat.from(context).notify(BADGE_NOTIFICATION_ID, notification.build())
+                Log.d("AppBadger", "Badge notification posted successfully")
+            } catch (e: Exception) {
+                Log.w("AppBadger", "Failed to post badge notification", e)
+            }
+        } else {
+            Log.w("AppBadger", "Notifications are disabled, badge update will rely only on ShortcutBadger")
+        }
+    }
+
+    private fun clearBadge(context: Context) {
+        Log.d("AppBadger", "clearBadge called")
+        try {
+            NotificationManagerCompat.from(context).cancel(BADGE_NOTIFICATION_ID)
+            Log.d("AppBadger", "Badge notification cancelled")
+        } catch (e: Exception) {
+            Log.w("AppBadger", "Failed to cancel badge notification", e)
+        }
+
+        try {
+            val success = ShortcutBadger.removeCount(context)
+            Log.d("AppBadger", "ShortcutBadger.removeCount result: $success")
+        } catch (e: Exception) {
+            Log.e("AppBadger", "ShortcutBadger.removeCount failed", e)
+        }
+    }
+
+    private fun buildBadgeNotification(context: Context, count: Int): NotificationCompat.Builder {
+        ensureBadgeChannel(context)
+        return NotificationCompat.Builder(context, BADGE_CHANNEL_ID)
+            .setSmallIcon(context.applicationInfo.icon)
+            .setContentTitle("App badge")
+            .setContentText("Badge count: $count")
+            .setNumber(count)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOnlyAlertOnce(true)
+            .setAutoCancel(false)
+            .setSilent(true)
+            .setOngoing(true)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
+            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+    }
+
+    private fun ensureBadgeChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channel = NotificationChannel(
+                BADGE_CHANNEL_ID,
+                "App badge updates",
+                NotificationManager.IMPORTANCE_LOW,
+            )
+            channel.description = "Used to sync badge counts with the launcher"
+            manager.createNotificationChannel(channel)
         }
     }
 
@@ -96,5 +196,7 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
     companion object {
         private const val CHANNEL_NAME = "app_badger"
+        private const val BADGE_NOTIFICATION_ID = 1001
+        private const val BADGE_CHANNEL_ID = "app_badger_badges"
     }
 }
