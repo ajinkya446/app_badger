@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
@@ -11,7 +12,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -65,7 +65,8 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activity
 
                 try {
                     applyBadgeCount(context, count)
-                    result.success(null)
+                    persistBadgeCount(context, count)
+                    result.success(true)
                 } catch (e: Exception) {
                     Log.e("ShortcutBadger", "Failed to apply badge count", e)
                     result.error("BADGE_ERROR", "Failed to update badge count", e.localizedMessage)
@@ -82,10 +83,51 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activity
 
                 try {
                     clearBadge(context)
-                    result.success(null)
+                    persistBadgeCount(context, 0)
+                    result.success(true)
                 } catch (e: Exception) {
                     Log.e("ShortcutBadger", "Failed to remove badge count", e)
                     result.error("BADGE_ERROR", "Failed to remove badge count", e.localizedMessage)
+                }
+            }
+
+            "getBadgeCount" -> {
+                val context = applicationContext
+                if (context == null) {
+                    result.success(0)
+                    return
+                }
+                val prefs = getPrefs(context)
+                result.success(prefs.getInt(PREF_BADGE_COUNT, 0))
+            }
+
+            "getDeviceManufacturer" -> {
+                result.success(Build.MANUFACTURER)
+            }
+
+            "getDeviceBrand" -> {
+                result.success(Build.BRAND)
+            }
+
+            "getPermissionStatus" -> {
+                val context = applicationContext
+                if (context == null) {
+                    result.success("notDetermined")
+                    return
+                }
+                val notificationsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        android.Manifest.permission.POST_NOTIFICATIONS
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                    result.success(
+                        if (notificationsEnabled && hasPermission) "granted"
+                        else if (!hasPermission) "notDetermined"
+                        else "denied"
+                    )
+                } else {
+                    result.success(if (notificationsEnabled) "granted" else "denied")
                 }
             }
 
@@ -108,6 +150,14 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activity
 
             else -> result.notImplemented()
         }
+    }
+
+    private fun persistBadgeCount(context: Context, count: Int) {
+        getPrefs(context).edit().putInt(PREF_BADGE_COUNT, count).apply()
+    }
+
+    private fun getPrefs(context: Context): SharedPreferences {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
     private fun applyBadgeCount(context: Context, count: Int) {
@@ -253,5 +303,7 @@ class AppBadgerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Activity
         private const val BADGE_NOTIFICATION_ID = 1001
         private const val BADGE_CHANNEL_ID = "app_badger_badges"
         private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
+        private const val PREFS_NAME = "app_badger_prefs"
+        private const val PREF_BADGE_COUNT = "badge_count"
     }
 }
